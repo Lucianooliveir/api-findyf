@@ -24,14 +24,21 @@ export class LoginController {
 
   @Post('/cadastro')
   async cadastro(@Body() user: User, @Res() res: Response) {
-    const access_token = await this.loginService.cadastro(user);
-    if (access_token === null) {
-      res.statusMessage = 'Usuário ja existente';
-      res.status(HttpStatus.CONFLICT).send();
+    try {
+      const access_token = await this.loginService.cadastro(user);
+      if (access_token === null) {
+        res.statusMessage = 'Usuário ja existente';
+        res.status(HttpStatus.CONFLICT).send();
+        return;
+      }
+      res.send({ token: access_token?.access_token });
+      res.status(HttpStatus.OK).send();
+      return;
+    } catch {
+      res.send({ Erro: 'Erro de validacao' });
+      res.status(HttpStatus.BAD_REQUEST).send();
+      return;
     }
-    console.log(access_token);
-    res.send({ token: access_token?.access_token });
-    res.status(HttpStatus.OK).send();
   }
 
   @Post('/login')
@@ -41,6 +48,7 @@ export class LoginController {
       res.status(HttpStatus.BAD_REQUEST).send();
       return;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const token = await this.loginService.login(login.email, login.senha);
 
     if (token === null) {

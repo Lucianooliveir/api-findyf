@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'user' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,7 +14,7 @@ export class User {
   @Column({ length: 90 })
   email: string;
 
-  @Column({ length: 25 })
+  @Column()
   senha: string;
 
   @Column({ length: 10 })

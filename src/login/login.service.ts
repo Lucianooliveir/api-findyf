@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class LoginService {
@@ -16,10 +17,10 @@ export class LoginService {
   }
 
   async cadastro(user: User): Promise<{ access_token: string } | null> {
-    console.log(await this.userRepository.findOneBy({ email: user.email }));
     if ((await this.userRepository.findOneBy({ email: user.email })) != null) {
       return null;
     }
+    user.senha = await bcrypt.hash(user.senha, 10);
     await this.userRepository.insert(user);
     const created = await this.userRepository.findOneBy({ email: user.email });
 
@@ -36,10 +37,14 @@ export class LoginService {
   ): Promise<{ access_token: string } | null> {
     const user = await this.userRepository.findOneBy({
       email: email,
-      senha: senha,
     });
 
     if (user === null) {
+      return null;
+    }
+
+    const isMatch = await bcrypt.compare(senha, user?.senha);
+    if (!isMatch) {
       return null;
     }
 

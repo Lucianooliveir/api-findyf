@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Postagem } from 'src/postagem/models/post.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'user' })
+@Entity({ name: 'user', schema: 'public' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -22,4 +23,7 @@ export class User {
 
   @Column({ length: 10 })
   numero: string;
+
+  @OneToMany(() => Postagem, (postagem) => postagem.user_infos)
+  postagens: Postagem[];
 }

@@ -6,9 +6,10 @@ import { DatabaseModule } from './database/database.module';
 import { LoginModule } from './login/login.module';
 import { FeedController } from './feed/feed.controller';
 import { FeedModule } from './feed/feed.module';
+import { PostagemModule } from './postagem/postagem.module';
 
 @Module({
-  imports: [DatabaseModule, LoginModule, FeedModule],
+  imports: [DatabaseModule, LoginModule, FeedModule, PostagemModule],
   controllers: [AppController, HealthController, FeedController],
   providers: [AppService],
 })

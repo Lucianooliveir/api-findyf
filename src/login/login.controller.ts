@@ -13,7 +13,7 @@ import { LoginService } from './login.service';
 import { User } from './models/user.entity';
 import { AuthGuard } from './login.guard';
 import { Response } from 'express';
-import { ExpressAdapter, FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { loginEntity } from './models/login.entity';
 
 @Controller('auth')
@@ -41,11 +41,14 @@ export class LoginController {
         res.status(HttpStatus.CONFLICT).send();
         return;
       }
-      res.send({ token: access_token?.access_token });
+
+      access_token.user.senha = '';
+      res.send({ token: access_token?.access_token, user: access_token.user });
       res.status(HttpStatus.OK).send();
 
       return;
-    } catch {
+    } catch (e) {
+      console.log(e);
       res.send({ Erro: 'Erro de validacao' });
       res.status(HttpStatus.BAD_REQUEST).send();
       return;
@@ -60,7 +63,6 @@ export class LoginController {
         res.status(HttpStatus.BAD_REQUEST).send();
         return;
       }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       const token = await this.loginService.login(login.email, login.senha);
 
       if (token === null) {
@@ -68,7 +70,9 @@ export class LoginController {
         res.status(HttpStatus.NOT_FOUND).send();
         return;
       }
-      res.send({ token: token?.access_token });
+
+      token.user.senha = '';
+      res.send({ token: token?.access_token, userinfo: token.user });
       res.status(HttpStatus.OK).send();
       return;
     } catch {

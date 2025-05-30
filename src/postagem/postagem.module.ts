@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PostagemController } from './postagem.controller';
 import { PostagemService } from './postagem.service';
-import { likesProviders, postagemProviders } from './postagem.providers';
+import {
+  comentarioProviders,
+  likesProviders,
+  postagemProviders,
+} from './postagem.providers';
 import { databaseProviders } from 'src/database/database.providers';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -13,6 +17,7 @@ import { diskStorage } from 'multer';
     ...postagemProviders,
     ...databaseProviders,
     ...likesProviders,
+    ...comentarioProviders,
   ],
   imports: [
     MulterModule.register({

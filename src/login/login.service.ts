@@ -19,26 +19,33 @@ export class LoginService {
   async cadastro(
     user: User,
     file: Express.Multer.File,
-  ): Promise<{ access_token: string } | null> {
+  ): Promise<{ access_token: string; user: User } | null> {
     if ((await this.userRepository.findOneBy({ email: user.email })) != null) {
       return null;
     }
     user.senha = await bcrypt.hash(user.senha, 10);
+    user.abrigo = false;
     user.imagem_perfil = file.path;
     await this.userRepository.insert(user);
+
     const created = await this.userRepository.findOneBy({ email: user.email });
+
+    if (created === null) {
+      return null;
+    }
 
     const payload = { sub: created?.id, username: created?.email };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
+      user: created,
     };
   }
 
   async login(
     email: string,
     senha: string,
-  ): Promise<{ access_token: string } | null> {
+  ): Promise<{ access_token: string; user: User } | null> {
     const user = await this.userRepository.findOneBy({
       email: email,
     });
@@ -56,6 +63,7 @@ export class LoginService {
 
     return {
       access_token: await this.jwtService.signAsync(payload),
+      user: user,
     };
   }
 }

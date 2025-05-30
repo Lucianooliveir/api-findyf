@@ -4,6 +4,7 @@ import {
   Get,
   HttpStatus,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseGuards,
@@ -15,6 +16,7 @@ import { PostagemService } from './postagem.service';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Likes } from './models/like.entity';
+import { Comentario } from './models/comentario.entity';
 
 @Controller('postagem')
 export class PostagemController {
@@ -33,10 +35,12 @@ export class PostagemController {
     return;
   }
 
-  @UseGuards(AuthGuard)
-  @Get('/getPostagens')
-  async todasPostagens() {
-    const resp = await this.postagemService.getPostagens();
+  // @UseGuards(AuthGuard)
+  @Get('/getPostagensByUser')
+  async todasPostagens(@Query() query: { id?: string }) {
+    console.log(query.id);
+    const idNumber = query.id !== undefined ? Number(query.id) : undefined;
+    const resp = await this.postagemService.getPostagens(idNumber as number);
     resp.map((e) => (e.user_infos.senha = ''));
     console.log(resp);
     return resp;
@@ -47,5 +51,12 @@ export class PostagemController {
   async curtir(@Body() like: Likes) {
     console.log(like);
     await this.postagemService.curtir(like);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/comentar')
+  async comentar(@Body() comentario: Comentario) {
+    console.log(comentario);
+    await this.postagemService.comentar(comentario);
   }
 }

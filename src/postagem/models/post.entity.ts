@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Likes } from './like.entity';
+import { Comentario } from './comentario.entity';
 
 @Entity({ name: 'posts' })
 export class Postagem {
@@ -27,4 +28,7 @@ export class Postagem {
 
   @OneToMany(() => Likes, (likes) => likes.post_infos)
   curtidas: Likes[];
+
+  @OneToMany(() => Postagem, (postagem) => postagem.id)
+  comentarios: Comentario[];
 }

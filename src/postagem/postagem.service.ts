@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Postagem } from './models/post.entity';
-import { Repository } from 'typeorm';
+import { QueryResult, Repository } from 'typeorm';
 import { Likes } from './models/like.entity';
+import { Comentario } from './models/comentario.entity';
 
 @Injectable()
 export class PostagemService {
@@ -10,6 +11,8 @@ export class PostagemService {
     private postagemRepository: Repository<Postagem>,
     @Inject('LIKES_REPOSITORY')
     private likesRepository: Repository<Likes>,
+    @Inject('COMENTARIO_REPOSITORY')
+    private comentarioRepository: Repository<Comentario>,
   ) {}
 
   async postar(postagem: Postagem, file: Express.Multer.File) {
@@ -20,9 +23,14 @@ export class PostagemService {
     return response;
   }
 
-  async getPostagens() {
+  async getPostagens(id: number) {
     const response = await this.postagemRepository.find({
       relations: ['user_infos', 'curtidas'],
+      where: {
+        user_infos: {
+          id: id,
+        },
+      },
     });
 
     return response;
@@ -30,8 +38,22 @@ export class PostagemService {
 
   async curtir(like: Likes) {
     console.log(like);
-    const response = await this.likesRepository.insert(like);
-    console.log(response);
+    let response: any;
+    if (
+      (await this.likesRepository.findOneBy({
+        user_infos: like.user_infos,
+      })) === null
+    ) {
+      response = await this.likesRepository.insert(like);
+    } else {
+      response = await this.likesRepository.delete(like);
+    }
+    return response;
+  }
+
+  async comentar(comentario: Comentario) {
+    console.log(comentario);
+    const response = await this.comentarioRepository.insert(comentario);
     return response;
   }
 }

@@ -1,3 +1,4 @@
+import { Comentario } from 'src/postagem/models/comentario.entity';
 import { Likes } from 'src/postagem/models/like.entity';
 import { Postagem } from 'src/postagem/models/post.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -36,4 +37,7 @@ export class User {
 
   @OneToMany(() => Likes, (likes) => likes.user_infos)
   curtidos: Likes[];
+
+  @OneToMany(() => Postagem, (postagem) => postagem.id)
+  comentarios: Comentario[];
 }

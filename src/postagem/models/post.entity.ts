@@ -1,7 +1,14 @@
-import { User } from 'src/login/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/login/models/user.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Likes } from './like.entity';
 
-@Entity({ name: 'postagem', schema: 'public', synchronize: false })
+@Entity({ name: 'posts' })
 export class Postagem {
   @PrimaryGeneratedColumn()
   id: number;
@@ -12,6 +19,12 @@ export class Postagem {
   @Column()
   data: Date;
 
+  @Column()
+  imagem_post: string;
+
   @ManyToOne(() => User, (user) => user.id)
   user_infos: User;
+
+  @OneToMany(() => Likes, (likes) => likes.post_infos)
+  curtidas: Likes[];
 }

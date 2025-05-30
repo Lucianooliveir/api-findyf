@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './models/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -16,11 +16,15 @@ export class LoginService {
     return this.userRepository.find();
   }
 
-  async cadastro(user: User): Promise<{ access_token: string } | null> {
+  async cadastro(
+    user: User,
+    file: Express.Multer.File,
+  ): Promise<{ access_token: string } | null> {
     if ((await this.userRepository.findOneBy({ email: user.email })) != null) {
       return null;
     }
     user.senha = await bcrypt.hash(user.senha, 10);
+    user.imagem_perfil = file.path;
     await this.userRepository.insert(user);
     const created = await this.userRepository.findOneBy({ email: user.email });
 

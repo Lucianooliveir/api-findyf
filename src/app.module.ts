@@ -7,6 +7,7 @@ import { LoginModule } from './login/login.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { PostagemModule } from './postagem/postagem.module';
 import { join } from 'path';
+import { AnimalModule } from './animal/animal.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads/',
     }),
+    AnimalModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

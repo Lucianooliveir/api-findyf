@@ -35,28 +35,35 @@ export class PostagemController {
     return;
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Get('/getPostagensByUser')
   async todasPostagens(@Query() query: { id?: string }) {
     console.log(query.id);
     const idNumber = query.id !== undefined ? Number(query.id) : undefined;
-    const resp = await this.postagemService.getPostagens(idNumber as number);
+    const resp = await this.postagemService.getPostagensById(
+      idNumber as number,
+    );
     resp.map((e) => (e.user_infos.senha = ''));
     console.log(resp);
     return resp;
   }
 
   @UseGuards(AuthGuard)
+  @Get('/getPostagens')
+  async getPostagens() {
+    const resp = await this.postagemService.getPostagens();
+    return resp;
+  }
+
+  @UseGuards(AuthGuard)
   @Post('/curtir')
   async curtir(@Body() like: Likes) {
-    console.log(like);
     await this.postagemService.curtir(like);
   }
 
   @UseGuards(AuthGuard)
   @Post('/comentar')
   async comentar(@Body() comentario: Comentario) {
-    console.log(comentario);
     await this.postagemService.comentar(comentario);
   }
 }

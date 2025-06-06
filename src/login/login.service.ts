@@ -3,12 +3,15 @@ import { Repository } from 'typeorm';
 import { User } from './models/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { Abrigo } from './models/abrigo.entity';
 
 @Injectable()
 export class LoginService {
   constructor(
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<User>,
+    @Inject('ABRIGO_REPOSITORY')
+    private abrigoRepository: Repository<Abrigo>,
     private jwtService: JwtService,
   ) {}
 
@@ -24,7 +27,6 @@ export class LoginService {
       return null;
     }
     user.senha = await bcrypt.hash(user.senha, 10);
-    user.abrigo = false;
     user.imagem_perfil = file.path;
     await this.userRepository.insert(user);
 
@@ -65,5 +67,20 @@ export class LoginService {
       access_token: await this.jwtService.signAsync(payload),
       user: user,
     };
+  }
+
+  async cadastrarAbrigo(abrigo: Abrigo): Promise<Abrigo | null> {
+    if (
+      (await this.abrigoRepository.findOneBy({
+        crmv_responsavel: abrigo.crmv_responsavel,
+      })) != null
+    ) {
+      return null;
+    }
+    await this.abrigoRepository.insert(abrigo);
+    const created = await this.abrigoRepository.findOneBy({
+      crmv_responsavel: abrigo.crmv_responsavel,
+    });
+    return created;
   }
 }

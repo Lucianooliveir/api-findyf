@@ -8,7 +8,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Findyf')
     .setDescription('Api findyf')
-    .setVersion('0.1')
+    .setVersion('1.0')
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

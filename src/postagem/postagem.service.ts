@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Postagem } from './models/post.entity';
-import { QueryResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Likes } from './models/like.entity';
 import { Comentario } from './models/comentario.entity';
 
@@ -16,14 +16,13 @@ export class PostagemService {
   ) {}
 
   async postar(postagem: Postagem, file: Express.Multer.File) {
-    console.log(file.path);
     postagem.imagem_post = file.path;
     postagem.data = new Date(Date.now());
     const response = await this.postagemRepository.insert(postagem);
     return response;
   }
 
-  async getPostagens(id: number) {
+  async getPostagensById(id: number) {
     const response = await this.postagemRepository.find({
       relations: ['user_infos', 'curtidas'],
       where: {
@@ -32,12 +31,18 @@ export class PostagemService {
         },
       },
     });
+    return response;
+  }
 
+  async getPostagens() {
+    const response = await this.postagemRepository.find({
+      relations: ['user_infos', 'curtidas'],
+      order: { data: 'DESC' },
+    });
     return response;
   }
 
   async curtir(like: Likes) {
-    console.log(like);
     let response: any;
     if (
       (await this.likesRepository.findOneBy({
@@ -48,11 +53,11 @@ export class PostagemService {
     } else {
       response = await this.likesRepository.delete(like);
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return response;
   }
 
   async comentar(comentario: Comentario) {
-    console.log(comentario);
     const response = await this.comentarioRepository.insert(comentario);
     return response;
   }

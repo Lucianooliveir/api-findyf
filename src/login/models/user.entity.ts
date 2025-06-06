@@ -29,9 +29,6 @@ export class User {
   @Column()
   imagem_perfil: string;
 
-  @Column()
-  abrigo: boolean;
-
   @OneToMany(() => Postagem, (postagem) => postagem.user_infos)
   postagens: Postagem[];
 

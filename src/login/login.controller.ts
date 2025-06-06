@@ -15,6 +15,7 @@ import { AuthGuard } from './login.guard';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { loginEntity } from './models/login.entity';
+import { Abrigo } from './models/abrigo.entity';
 
 @Controller('auth')
 export class LoginController {
@@ -73,6 +74,28 @@ export class LoginController {
 
       token.user.senha = '';
       res.send({ token: token?.access_token, userinfo: token.user });
+      res.status(HttpStatus.OK).send();
+      return;
+    } catch {
+      res.send({ Erro: 'Erro de validacao' });
+      res.status(HttpStatus.BAD_REQUEST).send();
+      return;
+    }
+  }
+
+  @Post('/cadastrarAbrigo')
+  @UseGuards(AuthGuard)
+  async cadastrarAbrigo(@Body() abrigo: Abrigo, @Res() res: Response) {
+    try {
+      const abrigoCadastrado = await this.loginService.cadastrarAbrigo(abrigo);
+
+      if (abrigoCadastrado === null) {
+        res.statusMessage = 'Abrigo já existente';
+        res.status(HttpStatus.CONFLICT).send();
+        return;
+      }
+
+      res.send(abrigoCadastrado);
       res.status(HttpStatus.OK).send();
       return;
     } catch {

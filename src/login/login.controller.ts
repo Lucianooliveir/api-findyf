@@ -35,6 +35,8 @@ export class LoginController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     try {
+      console.log(user);
+      console.log(file);
       const access_token = await this.loginService.cadastro(user, file);
 
       if (access_token === null) {

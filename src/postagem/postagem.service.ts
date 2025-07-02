@@ -42,19 +42,26 @@ export class PostagemService {
     return response;
   }
 
-  async curtir(like: Likes) {
-    let response: any;
-    if (
-      (await this.likesRepository.findOneBy({
-        user_infos: like.user_infos,
-      })) === null
-    ) {
-      response = await this.likesRepository.insert(like);
+  async curtir(like) {
+    console.log('Looking for like:', like.post_infos?.id, like.user_infos?.id);
+
+    const existingLike = await this.likesRepository.findOne({
+      where: {
+        post_infos: { id: like.post_infos },
+        user_infos: { id: like.user_infos },
+      },
+    });
+
+    console.log('Existing like:', existingLike);
+
+    if (!existingLike) {
+      return await this.likesRepository.insert(like);
     } else {
-      response = await this.likesRepository.delete(like);
+      return await this.likesRepository.delete({
+        post_infos: { id: like.post_infos },
+        user_infos: { id: like.user_infos },
+      });
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return response;
   }
 
   async comentar(comentario: Comentario) {

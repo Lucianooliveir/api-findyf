@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { Postagem } from './post.entity';
 import { User } from 'src/login/models/user.entity';
 
@@ -7,9 +7,11 @@ export class Likes {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Postagem, (postagem) => postagem.id)
+  @ManyToOne(() => Postagem)
+  @JoinColumn({ name: 'postInfosId' }) // <-- match your DB column
   post_infos: Postagem;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userInfosId' }) // <-- match your DB column
   user_infos: User;
 }

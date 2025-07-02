@@ -58,6 +58,7 @@ export class PostagemController {
   @UseGuards(AuthGuard)
   @Post('/curtir')
   async curtir(@Body() like: Likes) {
+    console.log(like);
     await this.postagemService.curtir(like);
   }
 

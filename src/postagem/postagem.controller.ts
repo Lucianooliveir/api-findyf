@@ -17,6 +17,7 @@ import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Likes } from './models/like.entity';
 import { Comentario } from './models/comentario.entity';
+import { CreatePostagemDto } from './models/create-postagem.dto';
 
 @Controller('postagem')
 export class PostagemController {
@@ -33,6 +34,36 @@ export class PostagemController {
     res.statusMessage = 'postado com sucesso';
     res.status(HttpStatus.OK).send();
     return;
+  }
+
+  @Post('/criarPostagem')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(AuthGuard)
+  async CriarPostagem(
+    @Body() dto: CreatePostagemDto,
+    @Res() res: Response,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    try {
+      await this.postagemService.criarPostagem(dto, file);
+      res.statusMessage = 'Postagem criada com sucesso';
+      res.status(HttpStatus.OK).send();
+      return;
+    } catch (error: any) {
+      if (error.message === 'User not found') {
+        res.statusMessage = 'Usuário não encontrado';
+        res.status(HttpStatus.NOT_FOUND).send();
+        return;
+      }
+      if (error.message === 'Animal not found') {
+        res.statusMessage = 'Animal não encontrado';
+        res.status(HttpStatus.NOT_FOUND).send();
+        return;
+      }
+      res.statusMessage = 'Erro interno do servidor';
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
+      return;
+    }
   }
 
   @UseGuards(AuthGuard)

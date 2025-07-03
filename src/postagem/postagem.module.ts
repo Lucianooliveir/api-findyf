@@ -5,6 +5,8 @@ import {
   comentarioProviders,
   likesProviders,
   postagemProviders,
+  userProviders,
+  animalProviders,
 } from './postagem.providers';
 import { databaseProviders } from 'src/database/database.providers';
 import { MulterModule } from '@nestjs/platform-express';
@@ -18,6 +20,8 @@ import { diskStorage } from 'multer';
     ...databaseProviders,
     ...likesProviders,
     ...comentarioProviders,
+    ...userProviders,
+    ...animalProviders,
   ],
   imports: [
     MulterModule.register({

@@ -1,7 +1,14 @@
 import { Comentario } from 'src/postagem/models/comentario.entity';
 import { Likes } from 'src/postagem/models/like.entity';
 import { Postagem } from 'src/postagem/models/post.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Abrigo } from './abrigo.entity';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'user' })
 export class User {
@@ -37,4 +44,10 @@ export class User {
 
   @OneToMany(() => Comentario, (comentario) => comentario.autor)
   comentarios: Comentario[];
+
+  @OneToOne(() => Abrigo, (abrigo) => abrigo.user_infos)
+  abrigo: Abrigo;
+
+  // Virtual field for API responses
+  isShelter?: boolean;
 }

@@ -15,7 +15,7 @@ import { AuthGuard } from './login.guard';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { loginEntity } from './models/login.entity';
-import { Abrigo } from './models/abrigo.entity';
+import { CreateAbrigoDto } from './models/abrigo.dto';
 
 @Controller('auth')
 export class LoginController {
@@ -46,7 +46,10 @@ export class LoginController {
       }
 
       access_token.user.senha = '';
-      res.send({ token: access_token?.access_token, user: access_token.user });
+      res.send({
+        token: access_token?.access_token,
+        userinfo: access_token.user,
+      });
       res.status(HttpStatus.OK).send();
 
       return;
@@ -75,7 +78,10 @@ export class LoginController {
       }
 
       token.user.senha = '';
-      res.send({ token: token?.access_token, userinfo: token.user });
+      res.send({
+        token: token?.access_token,
+        userinfo: token.user,
+      });
       res.status(HttpStatus.OK).send();
       return;
     } catch {
@@ -87,9 +93,14 @@ export class LoginController {
 
   @Post('/cadastrarAbrigo')
   @UseGuards(AuthGuard)
-  async cadastrarAbrigo(@Body() abrigo: Abrigo, @Res() res: Response) {
+  async cadastrarAbrigo(
+    @Body() abrigoDto: CreateAbrigoDto,
+    @Res() res: Response,
+  ) {
+    console.log(abrigoDto);
     try {
-      const abrigoCadastrado = await this.loginService.cadastrarAbrigo(abrigo);
+      const abrigoCadastrado =
+        await this.loginService.cadastrarAbrigo(abrigoDto);
 
       if (abrigoCadastrado === null) {
         res.statusMessage = 'Abrigo já existente';
@@ -100,7 +111,19 @@ export class LoginController {
       res.send(abrigoCadastrado);
       res.status(HttpStatus.OK).send();
       return;
-    } catch {
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'User not found') {
+          res.statusMessage = 'Usuário não encontrado';
+          res.status(HttpStatus.NOT_FOUND).send();
+          return;
+        }
+        if (error.message === 'User already has an abrigo') {
+          res.statusMessage = 'Usuário já possui um abrigo';
+          res.status(HttpStatus.CONFLICT).send();
+          return;
+        }
+      }
       res.send({ Erro: 'Erro de validacao' });
       res.status(HttpStatus.BAD_REQUEST).send();
       return;

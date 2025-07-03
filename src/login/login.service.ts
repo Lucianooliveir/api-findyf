@@ -4,6 +4,7 @@ import { User } from './models/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Abrigo } from './models/abrigo.entity';
+import { CreateAbrigoDto } from './models/abrigo.dto';
 
 @Injectable()
 export class LoginService {
@@ -32,7 +33,7 @@ export class LoginService {
 
     const created = await this.userRepository.findOne({
       where: { email: user.email },
-      relations: ['curtidos', 'curtidos.post_infos', 'postagens'],
+      relations: ['curtidos', 'curtidos.post_infos', 'postagens', 'abrigo'],
     });
 
     if (created === null) {
@@ -40,6 +41,9 @@ export class LoginService {
     }
 
     const payload = { sub: created?.id, username: created?.email };
+
+    // Add isShelter field to the user object
+    created.isShelter = !!created.abrigo;
 
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -50,10 +54,13 @@ export class LoginService {
   async login(
     email: string,
     senha: string,
-  ): Promise<{ access_token: string; user: User } | null> {
+  ): Promise<{
+    access_token: string;
+    user: User;
+  } | null> {
     const user = await this.userRepository.findOne({
       where: { email: email },
-      relations: ['curtidos', 'curtidos.post_infos', 'postagens'],
+      relations: ['curtidos', 'curtidos.post_infos', 'postagens', 'abrigo'],
     });
 
     if (user === null) {
@@ -67,24 +74,57 @@ export class LoginService {
 
     const payload = { sub: user?.id, username: user?.email };
 
+    // Add isShelter field to the user object
+    user.isShelter = !!user.abrigo;
+
     return {
       access_token: await this.jwtService.signAsync(payload),
       user: user,
     };
   }
 
-  async cadastrarAbrigo(abrigo: Abrigo): Promise<Abrigo | null> {
+  async cadastrarAbrigo(abrigoDto: CreateAbrigoDto): Promise<Abrigo | null> {
+    // Check if abrigo already exists
     if (
       (await this.abrigoRepository.findOneBy({
-        crmv_responsavel: abrigo.crmv_responsavel,
+        crmv_responsavel: abrigoDto.crmv_responsavel,
       })) != null
     ) {
       return null;
     }
-    await this.abrigoRepository.insert(abrigo);
-    const created = await this.abrigoRepository.findOneBy({
-      crmv_responsavel: abrigo.crmv_responsavel,
+
+    // Find the user by ID
+    const user = await this.userRepository.findOneBy({
+      id: abrigoDto.user_infos,
     });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if user already has an abrigo
+    const existingAbrigo = await this.abrigoRepository.findOneBy({
+      user_infos: { id: user.id },
+    });
+
+    if (existingAbrigo) {
+      throw new Error('User already has an abrigo');
+    }
+
+    // Create the abrigo with the full user object
+    const abrigo = new Abrigo();
+    abrigo.nome_responsavel = abrigoDto.nome_responsavel;
+    abrigo.crmv_responsavel = abrigoDto.crmv_responsavel;
+    abrigo.telefone = abrigoDto.telefone;
+    abrigo.user_infos = user;
+
+    await this.abrigoRepository.insert(abrigo);
+
+    const created = await this.abrigoRepository.findOne({
+      where: { crmv_responsavel: abrigo.crmv_responsavel },
+      relations: ['user_infos'],
+    });
+
     return created;
   }
 }

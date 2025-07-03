@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   Res,
   UploadedFile,
@@ -40,9 +41,10 @@ export class AnimalController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('/getAnimaisByUserId')
-  async getAnimaisByUserId(@Body('userId') userId: number, @Res() res: any) {
+  @Get('/getAnimaisByUserId/:userId')
+  async getAnimaisByUserId(@Param('userId') userId: number, @Res() res: any) {
     try {
+      console.log(userId);
       const animais = await this.animalService.getAnimaisByUserId(userId);
       if (!animais || animais.length === 0) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access

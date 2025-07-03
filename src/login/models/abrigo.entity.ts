@@ -1,8 +1,9 @@
 import {
   Column,
   Entity,
-  ManyToOne,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
@@ -22,7 +23,8 @@ export class Abrigo {
   @Column()
   telefone: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @OneToOne(() => User, (user) => user.abrigo)
+  @JoinColumn()
   user_infos: User;
 
   @OneToMany(() => Animal, (animal) => animal.abrigo_infos)

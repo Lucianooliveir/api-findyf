@@ -1,4 +1,5 @@
 import { User } from 'src/login/models/user.entity';
+import { Animal } from 'src/animal/models/animal.entity';
 import {
   Column,
   Entity,
@@ -31,4 +32,7 @@ export class Postagem {
 
   @OneToMany(() => Comentario, (comentario) => comentario.postagem)
   comentarios: Comentario[];
+
+  @ManyToOne(() => Animal, (animal) => animal.id, { nullable: true })
+  animal: Animal | null;
 }

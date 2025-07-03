@@ -1,5 +1,12 @@
 import { Abrigo } from 'src/login/models/abrigo.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Postagem } from 'src/postagem/models/post.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'animal' })
 export class Animal {
@@ -26,4 +33,7 @@ export class Animal {
 
   @ManyToOne(() => Abrigo, (abrigo) => abrigo.id)
   abrigo_infos: Abrigo;
+
+  @OneToMany(() => Postagem, (postagem) => postagem.animal)
+  postagens: Postagem[];
 }

@@ -35,6 +35,6 @@ export class User {
   @OneToMany(() => Likes, (likes) => likes.user_infos)
   curtidos: Likes[];
 
-  @OneToMany(() => Postagem, (postagem) => postagem.id)
+  @OneToMany(() => Comentario, (comentario) => comentario.autor)
   comentarios: Comentario[];
 }

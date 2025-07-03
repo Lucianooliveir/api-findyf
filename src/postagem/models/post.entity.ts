@@ -29,6 +29,6 @@ export class Postagem {
   @OneToMany(() => Likes, (likes) => likes.post_infos)
   curtidas: Likes[];
 
-  @OneToMany(() => Postagem, (postagem) => postagem.id)
+  @OneToMany(() => Comentario, (comentario) => comentario.postagem)
   comentarios: Comentario[];
 }

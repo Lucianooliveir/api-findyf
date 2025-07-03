@@ -30,7 +30,10 @@ export class LoginService {
     user.imagem_perfil = file.path;
     await this.userRepository.insert(user);
 
-    const created = await this.userRepository.findOneBy({ email: user.email });
+    const created = await this.userRepository.findOne({
+      where: { email: user.email },
+      relations: ['curtidos', 'curtidos.post_infos', 'postagens'],
+    });
 
     if (created === null) {
       return null;
@@ -48,8 +51,9 @@ export class LoginService {
     email: string,
     senha: string,
   ): Promise<{ access_token: string; user: User } | null> {
-    const user = await this.userRepository.findOneBy({
-      email: email,
+    const user = await this.userRepository.findOne({
+      where: { email: email },
+      relations: ['curtidos', 'curtidos.post_infos', 'postagens'],
     });
 
     if (user === null) {

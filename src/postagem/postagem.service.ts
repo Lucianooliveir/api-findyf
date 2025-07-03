@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Postagem } from './models/post.entity';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { Likes } from './models/like.entity';
 import { Comentario } from './models/comentario.entity';
 
@@ -35,10 +35,25 @@ export class PostagemService {
   }
 
   async getPostagens() {
-    const response = await this.postagemRepository.find({
-      relations: ['user_infos', 'curtidas'],
-      order: { data: 'DESC' },
-    });
+    const response = await this.postagemRepository
+      .createQueryBuilder('postagem')
+      .leftJoinAndSelect('postagem.user_infos', 'user_infos')
+      .leftJoinAndSelect('user_infos.postagens', 'user_postagens')
+      .leftJoinAndSelect('user_infos.curtidos', 'user_curtidos')
+      .leftJoinAndSelect('user_curtidos.post_infos', 'curtidos_posts')
+      .leftJoinAndSelect('postagem.curtidas', 'curtidas')
+      .leftJoinAndSelect('curtidas.user_infos', 'curtidas_user')
+      .leftJoinAndSelect(
+        'postagem.comentarios',
+        'comentarios',
+        'comentarios.responde IS NULL',
+      )
+      .leftJoinAndSelect('comentarios.autor', 'comentarios_autor')
+      .leftJoinAndSelect('comentarios.respostas', 'respostas')
+      .leftJoinAndSelect('respostas.autor', 'respostas_autor')
+      .orderBy('postagem.data', 'DESC')
+      .getMany();
+
     return response;
   }
 

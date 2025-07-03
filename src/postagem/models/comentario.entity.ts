@@ -19,12 +19,12 @@ export class Comentario {
   @ManyToOne(() => User, (user) => user.id)
   autor: User;
 
-  @ManyToOne(() => Comentario, (comentario) => comentario.id)
+  @ManyToOne(() => Comentario, (comentario) => comentario.respostas)
   responde: Comentario;
 
-  @ManyToOne(() => Postagem, (postagem) => postagem.id)
+  @ManyToOne(() => Postagem, (postagem) => postagem.comentarios)
   postagem: Postagem;
 
-  @OneToMany(() => Comentario, (comentario) => comentario.id)
+  @OneToMany(() => Comentario, (comentario) => comentario.responde)
   respostas: Comentario[];
 }

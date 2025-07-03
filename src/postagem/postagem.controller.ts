@@ -64,7 +64,8 @@ export class PostagemController {
 
   @UseGuards(AuthGuard)
   @Post('/comentar')
-  async comentar(@Body() comentario: Comentario) {
+  async comentar(@Body() comentario) {
+    console.log(comentario);
     await this.postagemService.comentar(comentario);
   }
 }

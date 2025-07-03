@@ -8,6 +8,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { PostagemModule } from './postagem/postagem.module';
 import { join } from 'path';
 import { AnimalModule } from './animal/animal.module';
+import { EventosModule } from './eventos/eventos.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AnimalModule } from './animal/animal.module';
       serveRoot: '/uploads/',
     }),
     AnimalModule,
+    EventosModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

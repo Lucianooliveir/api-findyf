@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Animal } from 'src/animal/models/animal.entity';
+import { Evento } from 'src/eventos/models/evento.entity';
 
 @Entity({ name: 'abrigo' })
 export class Abrigo {
@@ -29,4 +30,7 @@ export class Abrigo {
 
   @OneToMany(() => Animal, (animal) => animal.abrigo_infos)
   animais: Animal[];
+
+  @OneToMany(() => Evento, (evento) => evento.abrigo)
+  eventos: Evento[];
 }
